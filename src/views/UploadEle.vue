@@ -35,6 +35,14 @@
 
     </div>
 
+
+    <div class="xlsx-box">
+      <el-upload ref="upload" action="/wm/upload/" :show-file-list="false" :auto-upload="false" :on-change="readExcel">
+        <el-button slot="trigger" icon="el-icon-upload" size="small" type="primary">上传文件</el-button>
+      </el-upload>
+
+    </div>
+
     
 
 
@@ -43,6 +51,7 @@
 
 
 <script>
+  import XLSX from 'xlsx'
 
 
   export default {
@@ -100,14 +109,35 @@
       },
       handlePreview(file) {
         console.log(file);
+      },
+
+
+      readExcel(file) {
+        // 定义fileReader，存放读取excel方法
+        const fileReader = new FileReader()
+        // 启动函数
+        fileReader.readAsBinaryString(file.raw)
+
+        // 监听
+        fileReader.onload = (ev) => {
+          let data = ev.target.result
+          let workbook = XLSX.read(data, {type: 'binary'})
+          for (let sheet in workbook.Sheets) {
+            const sheetArray = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
+            console.log(sheetArray)
+          }
+        }
+
+
+
       }
     },
 
   }
 </script>
 
-<style>
-
+<style scoped>
+  
   .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
@@ -130,6 +160,10 @@
     width: 178px;
     height: 178px;
     display: block;
+  }
+
+  .xlsx-box{
+    margin-top: 30px;
   }
 
 </style>
